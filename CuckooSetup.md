@@ -217,3 +217,42 @@ Validate on Exit**
 ###  Cuckoo Config Files
 
 *cd .cuckoo/conf*
+
+*nano cuckoo.conf*
+
+* [cuckoo]
+    * memory_dump = on
+    * machinery = virtualbox
+* [resultserver]
+    * ip = 192.168.56.1
+
+*nano auxiliary.conf*
+
+* [mitm]
+    * enable = yes
+* [sniffer]
+    * interface = vboxnet0
+
+*nano virtualbox.conf*
+
+* [virtualbox]
+    * machines =  Windows10VM
+    * interface = vboxnet0
+    * [Windows10VM]
+    * vm_path = PATH/TO/VBOX/FILE
+
+*nano processing.conf*
+
+* [memory]
+    * enable = yes
+
+*nano memory.conf*
+
+* [basic]
+    * guest_profile = Win10x64
+
+*nano reporting.conf*
+    * [reporthtml]
+        * enable = yes
+    * [mongodb]
+        * enable = yes
