@@ -214,7 +214,7 @@ Validate on Exit**
 
 *cuckoo -d* This command will setup default config files
 
-###  Cuckoo Config Files
+### Cuckoo Config Files
 
 *cd .cuckoo/conf*
 
