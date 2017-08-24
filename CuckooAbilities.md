@@ -1,5 +1,7 @@
 # Cuckoo Details
 
+## Dev team supports Debian based distros over Redhat Distros
+
 * Compatible with Virtualbox, KVM, ESXi, VMWare, VSphere, Xenserver, and QEMU (need to look into qemu more) [https://qemu.weilnetz.de/doc/qemu-doc.html]
 
 * Parallel analysis possible across multiple VM's
