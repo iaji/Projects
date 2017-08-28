@@ -126,6 +126,12 @@
 
 ### VirtualBox Setup
 
+*sudo apt-add-repository "deb http://download.virtualbox.org/virtualbox/debian $(lsb_release -sc) contrib"*
+
+*wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -*
+
+*sudo apt-get update*
+
 *sudo apt-get install virtualbox*
 
 *wget http://download.virtualbox.org/virtualbox/5.1.24/Oracle_VM_VirtualBox_Extension_Pack-5.1.24-117012.vbox-extpack*
