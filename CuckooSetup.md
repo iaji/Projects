@@ -132,10 +132,11 @@
 
 *sudo apt-get update*
 
-*sudo apt-get install virtualbox*
+*sudo apt-get install virtualbox-5.1*
 
-*wget http://download.virtualbox.org/virtualbox/5.1.24/Oracle_VM_VirtualBox_Extension_Pack-5.1.24-117012.vbox-extpack*
+*wget http://download.virtualbox.org/virtualbox/5.1.26/Oracle_VM_VirtualBox_Extension_Pack-5.1.26-117224.vbox-extpack*
 
+*sudo vboxmanage extpack install Oracle_VM_VirtualBox_Extension_Pack-5.1.26-117224.vbox-extpack*
 
 *sudo usermod -a -G vboxusers cuckoo*
 
