@@ -122,6 +122,7 @@
 *cd .mitmproxy/*
 
 *cp mitmproxy-ca-cert.p12 /home/cuckoo/.cuckoo/analyzer/windows/bin/cert.p12*
+
 *mitmdump = /usr/local/bin/mitmdump*
 
 ### VirtualBox Setup
@@ -215,6 +216,72 @@ Validate on Exit**
 #### Back to Ubuntu to Snapshot VM
 
 *vboxmanage snapshot "Windows10VM" take "snapshot01" --pause*
+
+## InetSim Config
+
+Download latest Remnux VM: https://remnux.org/
+
+**Set Static IP and DNS inside VM Preferences**
+
+VM Machine Network Settings:
+    * Adapter 1 nat
+    * Adapter 2 hostonly, vboxnet0
+
+VM Preferences:
+    * Network adapter settings:
+        * 192.168.56.1
+    * Network DHCP:
+        * Addr: 192.168.56.1
+        * Mask: 255.255.255.0
+        * Lower: 192.168.56.101
+        * Upper: 192.168.56.254
+
+**Setup Remnux network settings**
+
+Inside Remnux:
+
+*sudo nano /etc/network/interfaces*
+
+Change:
+
+    auto eth0
+    iface eth0 inet dhcp
+
+To:
+
+    auto eth0
+    iface eth0 inet static  
+    address 192.168.56.102
+    netmask 255.255.255.0
+    network 192.168.56.0
+    broadcast 192.168.56.255
+    gateway 192.168.56.1
+    dns-nameservers 8.8.8.8
+
+*sudo service networking restart*
+
+**Configure InetSim**
+
+*sudo nano /etc/default/inetsim*
+
+Change ENABLED=0 to 1
+
+exit
+
+*sudo nano /etc/inetsim/inetsim.conf*
+
+Start dns-nameservers service, and whatever else you want
+
+Find service_bind_address change, be SURE to uncomment!:
+
+service_bind_address    192.168.56.102
+
+Find dns_default_ip:
+
+dns_default_ip    192.168.56.102
+
+MORE TO COME
+
 
 
 ## Bringing It All Together
