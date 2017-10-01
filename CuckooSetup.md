@@ -1,4 +1,4 @@
-# Cuckoo Installation
+# Cuckoo 2.0.4 Installation
 
 ## Getting Pre-Requisites
 
@@ -21,21 +21,21 @@
 
 *sudo apt-get install python-virtualenv python-setuptools libjpeg-dev zlib1g-dev swig*
 
-*sudo apt-get install tcpdump apparmour-utils*
+*sudo apt-get install tcpdump apparmor-utils*
 
 *sudo apt-get install mongodb*
 
 *sudo apt-get install libcap2-bin*
 
-*sudo apt-get install autoconf* YARA
+*sudo apt-get install autoconf*
 
-*sudo apt-get install libtool-bin* YARA
+*sudo apt-get install libtool-bin*
 
-*sudo apt-get install libjansson-dev* YARA
+*sudo apt-get install libjansson-dev*
 
-*sudo apt-get install libmagic-dev* YARA
+*sudo apt-get install libmagic-dev*
 
-*sudo apt-get install python3-pip python3-dev libssl-dev libtiff5-dev libjpeg8-dev zlib1g-dev libwebp-dev* MITM Proxy
+*sudo apt-get install python3-pip python3-dev libssl-dev libtiff5-dev libjpeg8-dev zlib1g-dev libwebp-dev*
 
 ### Cuckoo Pre Setup
 
@@ -192,6 +192,7 @@ Validate on Exit**
 * **Set up a shared folder from the VM to .cuckoo/agent**
 * copy agent.py to the VM
 
+
 #### Back to Ubuntu for VM internet
 
 **These next commands will allow the VM to have internet access**
@@ -216,6 +217,93 @@ Validate on Exit**
 #### Back to Ubuntu to Snapshot VM
 
 *vboxmanage snapshot "Windows10VM" take "snapshot01" --pause*
+
+
+
+## Bringing It All Together
+
+*cuckoo -d* This command will setup default config files
+
+### Cuckoo Config Files
+
+*cd .cuckoo/conf*
+
+*nano cuckoo.conf*
+
+* [cuckoo]
+    * memory_dump = on
+    * machinery = virtualbox
+* [resultserver]
+    * ip = 192.168.56.1
+
+*nano auxiliary.conf*
+
+* [mitm]
+    * enable = yes
+* [sniffer]
+    * interface = vboxnet0
+
+*nano virtualbox.conf*
+
+* [virtualbox]
+    * machines =  Windows10VM
+    * interface = vboxnet0
+    * [Windows10VM]
+OUTDATED LINE -  vm_path = PATH/TO/VBOX/FILE
+
+*nano processing.conf*
+
+* [memory]
+    * enable = yes
+
+*nano memory.conf*
+
+* [basic]
+    * guest_profile = Win10x64
+
+*nano reporting.conf*
+    * [reporthtml]
+        * enable = yes
+    * [mongodb]
+        * enable = yes
+
+# !!!Experimental Section!!!
+
+
+**Install and Configure InetSim**
+
+*sudo su*
+
+*echo "deb http://www.inetsim.org/debian/ binary/" > /etc/apt/sources.list.d/inetsim.list*
+
+*wget -O - http://www.inetsim.org/inetsim-archive-signing-key.asc | apt-key add -*
+
+*sudo apt-get update*
+
+*sudo apt-get install inetsim*
+
+*sudo nano /etc/default/inetsim*
+
+Change ENABLED=0 to 1
+
+exit
+
+*sudo nano /etc/inetsim/inetsim.conf*
+
+Find service_bind_address change, be SURE to uncomment!:
+
+service_bind_address    192.168.56.1
+
+Find dns_default_ip:
+
+dns_default_ip    192.168.56.102
+
+MORE TO COME
+
+
+
+# WIP Tutorials
+
 
 ## InetSim Config
 
@@ -260,73 +348,73 @@ To:
 
 *sudo service networking restart*
 
-**Configure InetSim**
-
-*sudo nano /etc/default/inetsim*
-
-Change ENABLED=0 to 1
-
-exit
-
-*sudo nano /etc/inetsim/inetsim.conf*
-
-Start dns-nameservers service, and whatever else you want
-
-Find service_bind_address change, be SURE to uncomment!:
-
-service_bind_address    192.168.56.102
-
-Find dns_default_ip:
-
-dns_default_ip    192.168.56.102
-
-MORE TO COME
+## Webserver Setup
 
 
+*sudo apt-get install uwsgi uwsgi-plugin-python nginx*
 
-## Bringing It All Together
+**uwsgi**
 
-*cuckoo -d* This command will setup default config files
+*cuckoo web --uwsgi*
 
-### Cuckoo Config Files
+Copy the output of the command above
 
-*cd .cuckoo/conf*
+*sudo nano /etc/uwsgi/apps-available/cuckoo-web.ini*
 
-*nano cuckoo.conf*
+Paste the output into this new file and save it
 
-* [cuckoo]
-    * memory_dump = on
-    * machinery = virtualbox
-* [resultserver]
-    * ip = 192.168.56.1
+*sudo ln -s /etc/uwsgi/apps-available/cuckoo-web.ini /etc/uwsgi/apps-enabled/*
 
-*nano auxiliary.conf*
+*sudo service uwsgi start cuckoo-web*
 
-* [mitm]
-    * enable = yes
-* [sniffer]
-    * interface = vboxnet0
+**nginx**
 
-*nano virtualbox.conf*
+*cuckoo web --nginx*
 
-* [virtualbox]
-    * machines =  Windows10VM
-    * interface = vboxnet0
-    * [Windows10VM]
-    * vm_path = PATH/TO/VBOX/FILE
+Copy the output of the command above
 
-*nano processing.conf*
+*sudo nano /etc/nginx/sites-available/cuckoo-web*
 
-* [memory]
-    * enable = yes
+Paste the output into this new file and save it
 
-*nano memory.conf*
+*sudo adduser www-data cuckoo*
 
-* [basic]
-    * guest_profile = Win10x64
+*sudo ln -s /etc/nginx/sites-available/cuckoo-web /etc/nginx/sites-enabled/*
 
-*nano reporting.conf*
-    * [reporthtml]
-        * enable = yes
-    * [mongodb]
-        * enable = yes
+
+## Configure XRDP with xfce
+
+*sudo apt-get install XRDP*
+
+*sudo apt-get install xfce4*
+
+*echo xfce4-session >~.xsession*
+
+*sudo service xrdp restart*
+
+## Install IDA Pro
+
+*chmod +x IDAFILE.run*
+*./IDAFILE.run*
+
+## SSH into IDA Box
+*sudo apt-get install openssh-server*
+X11 forwarding built into ssh
+
+## Hiding the VM
+
+**Using github antivmdetection** This is not working well ATM
+source: https://byte-atlas.blogspot.de/2017/02/hardening-vbox-win7x64.html
+
+1) Download VolumeID (for x64)
+2) Download DevManView (for x64)
+3) # apt-get install acpidump (used by Python Script to fetch your system's parameters)
+4) # apt-get install libcdio-utils (contains "cd-drive", used to read these params)
+5) # apt-get install python-dmidecode (the pip-version of dmidecode is incompatible and useless for our purpose, so fetch the right one)
+6) $ git clone https://github.com/nsmfoo/antivmdetection.git
+7) $ cd antivmdetection :)
+8) $ echo "some-username" > user.lst (with your desired in-VM username(s))
+9) $ echo "some-computername" > computer.lst
+
+**In VM Settings**
+Windows 7 Enterprise
