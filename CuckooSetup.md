@@ -304,6 +304,19 @@ MORE TO COME
 
 # WIP Tutorials
 
+## Tor Routing Config
+
+*sudo apt-get install tor*
+
+*sudo nano /etc/tor/torrc*
+
+Append to file:
+
+*TransListenAddress 192.168.56.1
+TransPort 9040
+DNSListenAddress 192.168.56.1
+DNSPort 5353*
+
 
 ## InetSim Config
 
